@@ -1,2 +1,3 @@
-# go-gencon
-Generate generic go containers
+# Go Generic Containers
+
+Reduce boilerplate by generating containers for your datastructures
