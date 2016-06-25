@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+	"unicode"
+	"unicode/utf8"
 )
 
 var (
@@ -64,7 +66,13 @@ func main() {
 	if len(*name) > 0 {
 		cter = *name
 	}
-	g.nfo = FileInfo{*containee, cter, pkg}
+
+	g.nfo = GeneratorInfo{
+		Containee: *containee,
+		Container: cter,
+		Package:   *pkg,
+	}
+	g.nfo.Exported, g.nfo.Builtin = typeInfoFromString(*containee)
 	g.contType = *container
 	g.Printf(fmt.Sprintln("//", "$GOPACKAGE", os.Getenv("GOPACKAGE")))
 
@@ -93,16 +101,45 @@ func main() {
 
 }
 
+func typeInfoFromString(typename string) (isExported, isBuiltin bool) {
+	isBuiltin = false
+	switch typename {
+	case "uint8", "uint16", "uint32", "uint64":
+	case "int8", "int16", "int32", "int64":
+	case "float32", "float64", "complex64", "complex128":
+	case "byte", "rune":
+	case "uint", "int", "uintptr":
+		isBuiltin = true
+	}
+	isExported = isFirstUpper(typename)
+	return
+}
+
+func isFirstUpper(s string) bool {
+	r, n := utf8.DecodeRuneInString(s)
+	if n == 0 {
+		// should never get there
+		panic("Can't get first letter of an empty string...")
+	}
+	if r == utf8.RuneError {
+		// should never get there either
+		panic("Invalid encoding")
+	}
+	return unicode.IsUpper(r)
+}
+
 // Generator holds the state of the analysis. Primarily used to buffer
 // the output for format.Source.
 type Generator struct {
-	buf      bytes.Buffer // Accumulated output.
-	nfo      FileInfo     // Info needed to the generated file
-	contType string       // container to generate
+	buf      bytes.Buffer  // Accumulated output.
+	nfo      GeneratorInfo // Info needed to generate the file
+	contType string        // container to generate
 }
 
-type FileInfo struct {
+type GeneratorInfo struct {
 	Containee, Container, Package string
+	Exported                      bool // containee is an exported type
+	Builtin                       bool // containee is a builtin type
 }
 
 func (g *Generator) Printf(format string, args ...interface{}) {
