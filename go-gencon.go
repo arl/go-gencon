@@ -17,21 +17,21 @@ import (
 )
 
 var (
-	containee = flag.String("type", "", "type name of the containee; must be set")
-	container = flag.String("cont", "", "type of the generic container; must be set")
-	name      = flag.String("name", "", "override container name; default ContaineeContainer")
-	output    = flag.String("output", "", "output file name; default srcdir/<type>_string.go")
-	pkg       = flag.String("pkg", "", "package name of the generated file; only for cli usage")
+	container = flag.String("cont", "", "generic container type name; must be set")
+	containee = flag.String("type", "", "containee type name (user type or builtin); must be set")
+	name      = flag.String("name", "", "override generated container name; default 'ContaineeContainer' or 'containeeContainer' if containee is exported")
+	output    = flag.String("output", "", "output file name; default srcdir/containee_container.go")
+	pkg       = flag.String("pkg", "", "package name of the generated file; default to 'main' for cli usage or the containee package if go-gencon is called by `go generate`")
 )
 
 // Usage is a replacement usage function for the flags package.
 func Usage() {
-	fmt.Fprintf(os.Stderr, "Usage of %s with go generate:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "\tgo-gencon [flags] -type containee -cont container\n")
-	fmt.Fprintf(os.Stderr, "To use %s on the command line -pkg must be provided\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "Usage of go-gencon:\n")
+	fmt.Fprintf(os.Stderr, "    go-gencon [flags] -type containee -cont container\n")
+	fmt.Fprintf(os.Stderr, "\n")
 	fmt.Fprintf(os.Stderr, "Available generic containers:\n")
-	fmt.Fprintf(os.Stderr, " - Stack")
-	fmt.Fprintf(os.Stderr, " - BoundedStack")
+	fmt.Fprintf(os.Stderr, " - BoundedStack\n")
+	fmt.Fprintf(os.Stderr, "\n")
 	fmt.Fprintf(os.Stderr, "For more information, see:\n")
 	fmt.Fprintf(os.Stderr, "\thttp://github.com/aurelien-rainone/go-gencon\n")
 	fmt.Fprintf(os.Stderr, "Flags:\n")
