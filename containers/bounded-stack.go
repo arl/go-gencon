@@ -1,3 +1,8 @@
+// go gen-con - Go Generic Containers
+// Copyright 2016 Aurélien Rainone. All rights reserved.
+// Use of this source code is governed by a MIT license
+// that can be found in the LICENSE file.
+
 package containers
 
 const BoundedStack string = `
