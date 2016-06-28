@@ -12,11 +12,14 @@ package main
 import (
 	"fmt"
 	//"go/build"
+	"go/parser"
+	"go/token"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -60,33 +63,47 @@ func TestEndToEnd(t *testing.T) {
 		t.Fatalf("Readdirnames: %s", err)
 	}
 
-	// Read the testdata directory.
-	fd, err := os.Open("testdata")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer fd.Close()
-	names, err := fd.Readdirnames(-1)
-	if err != nil {
-		t.Fatalf("Readdirnames: %s", err)
-	}
 	// Generate, compile, and run the test programs.
 	for _, name := range names {
 		if !strings.HasSuffix(name, ".go") {
 			t.Errorf("%s is not a Go file", name)
 			continue
 		}
-		// call readGoGenConParams()
+		// Get corresponding test file name
+		testfile := fmt.Sprintf("testdata/%s_test.go", name[:len(name)-len(".go")])
+		args := readGoGenConParams(t, testfile)
 
 		// Names are known to be ASCII and long enough.
 		typeName := fmt.Sprintf("%c%s", name[0]+'A'-'a', name[1:len(name)-len(".go")])
-		fmt.Println("stringerCompileAndRun", dir, gogencon, typeName, name)
-		goGenConCompileAndRun(t, dir, gogencon, typeName, name)
+		fmt.Println("stringerCompileAndRun", dir, gogencon, typeName, name, args)
+		goGenConCompileAndRun(t, dir, gogencon, typeName, name, args)
 	}
 }
 
-func readGoGenConParams(filename string) []string {
+func readGoGenConParams(t *testing.T, filename string) string {
+	// parse and retrieve all the test file comments
+	fs := token.NewFileSet()
+	astFile, err := parser.ParseFile(fs, filename, nil, parser.ParseComments)
+	if err != nil {
+		t.Fatalf("parsing test file: %s: %s", filename, err)
+	}
 
+	// compile the regex that we'll use to find the special comment
+	rgx := `endtoend_test: go-gencon (.*)`
+	r, _ := regexp.Compile(rgx)
+	for i := range astFile.Comments {
+		// walk through the comments
+		cl := (*astFile.Comments[i]).List
+		for j := range cl {
+			cmt := cl[j].Text
+			if matches := r.FindAllStringSubmatch(cmt, -1); matches != nil {
+				return string(matches[0][0])
+			}
+		}
+	}
+	// shouldn't be here
+	t.Fatalf("No comment in %s contains the go-gencon special comment", filename)
+	return ""
 }
 
 // TODO: continuer ici : LIRE les parametres de go-gencon dans le fichier de test
@@ -95,7 +112,7 @@ func readGoGenConParams(filename string) []string {
 
 // goGenConCompileAndRun runs go-gencon for the named file and compiles and
 // runs the target binary in directory dir. That binary will panic if the String method is incorrect.
-func goGenConCompileAndRun(t *testing.T, dir, stringer, typeName, fileName string) {
+func goGenConCompileAndRun(t *testing.T, dir, stringer, typeName, fileName, args string) {
 	t.Logf("run: %s %s\n", fileName, typeName)
 	source := filepath.Join(dir, fileName)
 	err := copy(source, filepath.Join("testdata", fileName))
