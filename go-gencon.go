@@ -52,9 +52,11 @@ func main() {
 
 	if os.Getenv("GOPACKAGE") != "" {
 		*pkg = os.Getenv("GOPACKAGE")
+	} else if *pkg == "" {
+		*pkg = "main"
 	}
 
-	if *container == "" || *container == "" || *pkg == "" {
+	if *container == "" || *container == "" {
 		flag.Usage()
 		os.Exit(2)
 	}
@@ -86,16 +88,29 @@ func main() {
 	// Format the output.
 	src := g.format()
 
-	if *output == "" {
-		// generate output filename
-		baseName := fmt.Sprintf("%s_%s.go", *containee, *container)
-		*output = filepath.Join(".", strings.ToLower(baseName))
-	}
-	err := ioutil.WriteFile(*output, src, 0644)
+	// generate output filename
+	err := ioutil.WriteFile(
+		generateOutputFileName(*containee, *container, *output),
+		src, 0644)
 	if err != nil {
 		log.Fatalf("writing output: %s", err)
 	}
+}
 
+func generateOutputFileName(containee, container, outputFlag string) (fileName string) {
+	baseName := strings.ToLower(fmt.Sprintf("%s_%s.go", containee, container))
+	if outputFlag == "" {
+		fileName = filepath.Join(".", baseName)
+	} else {
+		if info, err := os.Stat(outputFlag); err == nil && info.IsDir() {
+			// -output is a directory
+			fileName = filepath.Join(outputFlag, baseName)
+		} else {
+			// -output is just a filename
+			fileName = filepath.Join(".", outputFlag)
+		}
+	}
+	return
 }
 
 func typeInfoFromString(typename string) (isExported, isBuiltin bool) {
