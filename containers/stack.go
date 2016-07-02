@@ -5,14 +5,13 @@
 
 package containers
 
-const BoundedStack string = `
+const Stack string = `
 package {{.Package}}
 
-// {{.Container}} represents a bounded stack of {{.Containee}}.
+// {{.Container}} represents a stack of {{.Containee}}.
 type {{.Container}} struct {
 	top  *item
 	size int
-	max  int
 }
 
 // internal item structure
@@ -22,37 +21,22 @@ type item struct {
 }
 
 {{if .Exported}}
-// New{{.Container}} initializes and returns a new bounded stack of {{.Containee}}
-func New{{.Container}}(max int) *{{.Container}} {
-	return &{{.Container}}{max: max}
-}
+// New{{.Container}} initializes and returns a new stack of {{.Containee}}
+func New{{.Container}}() *{{.Container}} {
 {{else}}
-// new{{.Container}} initializes and returns a new bounded stack of {{.Containee}}
-func new{{.Container}}(max int) *{{.Container}} {
-	return &{{.Container}}{max: max}
-}
+// new{{.Container}} initializes and returns a new stack of {{.Containee}}
+func new{{.Container}}() *{{.Container}} {
 {{end}}
+	return &{{.Container}}{}
+}
 
 // Len returns the stack's length
 func (s *{{.Container}}) Len() int {
 	return s.size
 }
 
-// Max returns the stack's maximum size
-func (s *{{.Container}}) Max() int {
-	return s.max
-}
-
-// Push pushes a new item on top of the stack.
-//
-// In case this operation would make the stack size greater than its maximum,
-// the bottommost element is removed before pushing the new one.
+// Push pushes a new item on top of the stack
 func (s *{{.Container}}) Push(value *{{.Containee}}) {
-	if s.size+1 > s.max {
-		if last := s.PopLast(); last == nil {
-			panic("Unexpected nil in stack")
-		}
-	}
 	s.top = &item{value, s.top}
 	s.size++
 }
