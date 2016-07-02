@@ -24,14 +24,12 @@ type item struct {
 {{if .Exported}}
 // New{{.Container}} initializes and returns a new bounded stack of {{.Containee}}
 func New{{.Container}}(max int) *{{.Container}} {
-	return &{{.Container}}{max: max}
-}
 {{else}}
 // new{{.Container}} initializes and returns a new bounded stack of {{.Containee}}
 func new{{.Container}}(max int) *{{.Container}} {
+{{end}}
 	return &{{.Container}}{max: max}
 }
-{{end}}
 
 // Len returns the stack's length
 func (s *{{.Container}}) Len() int {
