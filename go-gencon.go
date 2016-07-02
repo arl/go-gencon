@@ -36,6 +36,7 @@ func Usage() {
 	fmt.Fprintf(os.Stderr, "\n")
 	fmt.Fprintf(os.Stderr, "Available generic containers:\n")
 	fmt.Fprintf(os.Stderr, " - BoundedStack\n")
+	fmt.Fprintf(os.Stderr, " - LockFreeQueue\n")
 	fmt.Fprintf(os.Stderr, "\n")
 	fmt.Fprintf(os.Stderr, "For more information, see:\n")
 	fmt.Fprintf(os.Stderr, "\thttp://github.com/aurelien-rainone/go-gencon\n")
@@ -162,7 +163,8 @@ func (g *Generator) Printf(format string, args ...interface{}) {
 func (g *Generator) format() []byte {
 	// list supported containers
 	containers := map[string]string{
-		"boundedstack": containers.BoundedStack,
+		"boundedstack":  containers.BoundedStack,
+		"lockfreequeue": containers.LockFreeQueue,
 	}
 
 	// create container template
