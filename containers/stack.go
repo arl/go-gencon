@@ -63,14 +63,13 @@ func (s *{{.Container}}) PopLast() (value *{{.Containee}}) {
 	return nil
 }
 
-// Peek returns the topmost without removing it from the stack
+// Peek returns the topmost item without removing it from the stack
 func (s *{{.Container}}) Peek() (value *{{.Containee}}, exists bool) {
 	exists = false
 	if s.size > 0 {
 		value = s.top.value
 		exists = true
 	}
-
 	return
 }
 
