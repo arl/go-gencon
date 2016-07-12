@@ -58,7 +58,7 @@ func main() {
 		*pkg = "main"
 	}
 
-	if *container == "" || *container == "" {
+	if *containee == "" || *container == "" {
 		flag.Usage()
 		os.Exit(2)
 	}
