@@ -38,6 +38,7 @@ func Usage() {
 	fmt.Fprintf(os.Stderr, " - Stack\n")
 	fmt.Fprintf(os.Stderr, " - BoundedStack\n")
 	fmt.Fprintf(os.Stderr, " - LockFreeQueue\n")
+	fmt.Fprintf(os.Stderr, " - Set\n")
 	fmt.Fprintf(os.Stderr, "\n")
 	fmt.Fprintf(os.Stderr, "For more information, see:\n")
 	fmt.Fprintf(os.Stderr, "\thttp://github.com/aurelien-rainone/go-gencon\n")
@@ -167,6 +168,7 @@ func (g *Generator) format() []byte {
 		"stack":         containers.Stack,
 		"boundedstack":  containers.BoundedStack,
 		"lockfreequeue": containers.LockFreeQueue,
+		"set":           containers.Set,
 	}
 
 	// create container template
