@@ -40,4 +40,22 @@ func (s *{{.Container}}) Contains(i *{{.Containee}}) bool {
 func (s *{{.Container}}) Remove(i *{{.Containee}}) {
 	delete(s.set, i)
 }
+
+// Each runs a function for each element.
+//
+// If f() returns null, Each stops the iteration immeditely
+func (s *{{.Container}}) Each(f func(*{{.Containee}}) bool) {
+	for i := range s.set {
+		if !f(i) {
+			return
+		}
+	}
+}
+
+// Union adds all elements from another set
+func (s *{{.Container}}) Union(other *{{.Container}}) {
+	for i := range other.set {
+		s.set[i] = struct{}{}
+	}
+}
 `
