@@ -14,36 +14,35 @@ type {{.Container}} struct {
 	size int
 }
 
-// internal item structure
+// internal item structure.
 type item struct {
 	value *{{.Containee}}
 	next  *item
 }
 
 {{if .Exported}}
-// New{{.Container}} initializes and returns a new stack of {{.Containee}}
+// New{{.Container}} initializes and returns a new stack of {{.Containee}}.
 func New{{.Container}}() *{{.Container}} {
 {{else}}
-// new{{.Container}} initializes and returns a new stack of {{.Containee}}
+// new{{.Container}} initializes and returns a new stack of {{.Containee}}.
 func new{{.Container}}() *{{.Container}} {
-{{end}}
-	return &{{.Container}}{}
+{{end}}	return &{{.Container}}{}
 }
 
-// Len returns the stack's length
+// Len returns the stack's length.
 func (s *{{.Container}}) Len() int {
 	return s.size
 }
 
-// Push pushes a new item on top of the stack
+// Push pushes a new item on top of the stack.
 func (s *{{.Container}}) Push(value *{{.Containee}}) {
 	s.top = &item{value, s.top}
 	s.size++
 }
 
-// Pop removes the topmost item from the stack and return its value
+// Pop removes the topmost item from the stack and return its value.
 //
-// If the stack is empty, Pop returns nil
+// If the stack is empty, Pop returns nil.
 func (s *{{.Container}}) Pop() (value *{{.Containee}}) {
 	if s.size > 0 {
 		value, s.top = s.top.value, s.top.next
@@ -63,7 +62,7 @@ func (s *{{.Container}}) PopLast() (value *{{.Containee}}) {
 	return nil
 }
 
-// Peek returns the topmost item without removing it from the stack
+// Peek returns the topmost item without removing it from the stack.
 func (s *{{.Container}}) Peek() (value *{{.Containee}}, exists bool) {
 	exists = false
 	if s.size > 0 {
@@ -73,7 +72,7 @@ func (s *{{.Container}}) Peek() (value *{{.Containee}}, exists bool) {
 	return
 }
 
-// PeekN returns at max the N topmost item without removing them from the stack
+// PeekN returns at max the N topmost item without removing them from the stack.
 func (s *{{.Container}}) PeekN(n int) []*{{.Containee}} {
 	var (
 		N   []*{{.Containee}}
