@@ -1,3 +1,4 @@
 # Go Generic Containers
 
-Reduce boilerplate by generating containers for your datastructures
+Reduce boilerplate and keep type safety by generating containers for your data
+structures
